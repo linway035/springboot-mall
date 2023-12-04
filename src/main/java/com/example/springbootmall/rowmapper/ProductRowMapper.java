@@ -13,7 +13,13 @@ public class ProductRowMapper implements RowMapper<Product> {
         Product product =new Product();
         product.setProductId(rs.getInt("product_id"));
         product.setProductName(rs.getString("product_name"));
-        product.setCategory(ProductCategory.valueOf(rs.getString("category")));
+
+//        將資料庫取出來的String類型字串轉換成ProductCategory的enum值
+        String categoryStr = rs.getString("category");
+        ProductCategory category = ProductCategory.valueOf(categoryStr);
+        product.setCategory(category);
+//        product.setCategory(ProductCategory.valueOf(rs.getString("category")));
+
         product.setImageUrl(rs.getString("image_url"));
         product.setPrice(rs.getInt("price"));
         product.setStock(rs.getInt("stock"));
