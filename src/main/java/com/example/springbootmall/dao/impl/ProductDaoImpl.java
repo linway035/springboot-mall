@@ -99,10 +99,11 @@ public class ProductDaoImpl implements ProductDao {
         String sql = "SELECT product_id,product_name,category,image_url,price,stock,description," +
                 "created_date,last_modified_date FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
-        sql = sql + addFilteringSql(sql, map, productQueryParams);
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         sql = sql + " ORDER BY " + productQueryParams.getOrderBy() + " " + productQueryParams.getSort();
         sql = sql + " LIMIT :limit OFFSET :offset";
+        System.out.println(sql);
         map.put("limit", productQueryParams.getLimit());
         map.put("offset", productQueryParams.getOffset());
         List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
@@ -114,7 +115,7 @@ public class ProductDaoImpl implements ProductDao {
         String sql = "SELECT COUNT(*) FROM product WHERE 1=1";
         Map<String, Object> map = new HashMap<>();
 
-        sql = sql + addFilteringSql(sql, map, productQueryParams);
+        sql = addFilteringSql(sql, map, productQueryParams);
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
         return total;
