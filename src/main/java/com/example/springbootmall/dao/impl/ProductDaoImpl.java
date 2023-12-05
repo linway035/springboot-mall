@@ -1,5 +1,6 @@
 package com.example.springbootmall.dao.impl;
 
+import com.example.springbootmall.constant.ProductCategory;
 import com.example.springbootmall.dao.ProductDao;
 import com.example.springbootmall.dto.ProductRequest;
 import com.example.springbootmall.model.Product;
@@ -37,10 +38,10 @@ public class ProductDaoImpl implements ProductDao {
     public Integer createProduct(ProductRequest productRequest) {
         //enum java.sql.SQLException: Incorrect string value: '\xAC\xED\x00\x05~r...' for column 'category' at row 1
         //自行新增string解決此問題
-        String s =productRequest.getCategory().name();
+        String s = productRequest.getCategory().name();
         String sql = "INSERT INTO product (product_name, category, image_url, price, stock, description, " +
                 "created_date, last_modified_date) " +
-                "VALUES (:productName,'"+s+"',:imageUrl,:price,:stock,:description," +
+                "VALUES (:productName,'" + s + "',:imageUrl,:price,:stock,:description," +
                 ":createdDate,:lastModifiedDate);";
         Map<String, Object> map = new HashMap<>();
         map.put("productName", productRequest.getProductName());
@@ -70,8 +71,8 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public void updateProduct(Integer productId, ProductRequest productRequest) {
-        String sql = "UPDATE product SET product_name = :productName, category= :category, image_url= :imageUrl,"+
-                "price = :price, stock=:stock, description=:description, last_modified_date=:lastModifiedDate"+
+        String sql = "UPDATE product SET product_name = :productName, category= :category, image_url= :imageUrl," +
+                "price = :price, stock=:stock, description=:description, last_modified_date=:lastModifiedDate" +
                 " WHERE product_id=:productId";
         Map<String, Object> map = new HashMap<>();
         map.put("productId", productId);
@@ -87,9 +88,26 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public void deleteProductById(Integer productId) {
-        String sql="DELETE FROM product WHERE product_id=:productId";
-        Map<String,Object> map=new HashMap<>();
-        map.put("productId",productId);
-        namedParameterJdbcTemplate.update(sql,map);
+        String sql = "DELETE FROM product WHERE product_id=:productId";
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productId);
+        namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    @Override
+    public List<Product> getProducts(ProductCategory category, String search) {
+        String sql = "SELECT product_id,product_name,category,image_url,price,stock,description," +
+                "created_date,last_modified_date FROM product WHERE 1=1";
+        Map<String, Object> map = new HashMap<>();
+        if (category != null) {
+            sql = sql + " AND category=:category";
+            map.put("category", category.name()); //enum要使用.name()
+        }
+        if (search != null) {
+            sql = sql + " AND product_name LIKE :search";
+            map.put("search", "%" + search + "%"); //LIKE寫法，%要加在這裡而不能寫在上面
+        }
+        List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
+        return productList;
     }
 }
