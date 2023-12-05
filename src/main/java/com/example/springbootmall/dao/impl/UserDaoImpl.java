@@ -23,7 +23,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Integer createUser(UserRegisterRequest userRegisterRequest) {
-        String sql = "INSERT INTO user(email,password,created_date,last_modified_date) " +
+        String sql = "INSERT INTO user (email,password,created_date,last_modified_date) " +
                 "VALUES (:email,:password,:createdDate,:lastModifiedDate)";
         Map<String, Object> map = new HashMap<>();
         map.put("email", userRegisterRequest.getEmail());
